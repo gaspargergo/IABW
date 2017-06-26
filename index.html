@@ -69,6 +69,11 @@
       margin-left: 300px;
       margin-top: -20px;
       transform: rotate(-20deg);
+      transition: all 0.5s ease-in-out;
+    }
+
+    #text:hover{
+      transform: rotate(-25deg);
     }
 
   </style>
@@ -76,7 +81,7 @@
 
 <body>
   <center><a id="title" onClick="colorPixels()">instant ART</a>
-    <p id="text">Now in B&W!</p>
+    <a onClick="draw('square')"><p id="text">Now in B&W!</p></a>
 
   <div id="container"><canvas id="canvas" height="600px" width="600px"></canvas></div>
 
@@ -90,6 +95,13 @@
 
 
   <script>
+
+  document.addEventListener('mousedown', function (event) {
+    if (event.detail > 1) {
+      event.preventDefault();
+      }
+    }, false);
+  
   var c=document.getElementById("canvas");
   var ctx=c.getContext("2d");
   ctx.clearRect(0, 0, c.width, c.height);
@@ -113,6 +125,8 @@
         x += pixelSize;
       }
     }
+
+    console.log("The number of different possibilities: " + Math.pow(2,sizes[pixelArrayCounter]));
   }
 
   function changePixelSize(param){ //NOW WRITES THE NUMBER OF PIXELS INSTEAD OF THE SIZE
@@ -126,6 +140,33 @@
     document.getElementById("sizeNumber").innerHTML = sizes[pixelArrayCounter];
   }
   
+  function draw(code){
+    var x = 0;
+    var y = 0;
+    switch(code){
+      case "square":
+        code = "0000000001111110011111100111111001111110011111100111111000000000";
+        break;
+        
+      default:
+        break;
+    }
+
+    ctx.clearRect(0, 0, c.width, c.height);
+    var pixelSize = c.height/(Math.sqrt(code.length));
+    for(var i = 0; i < code.length; i++){
+      ctx.fillStyle = (code[i] === '0' ? "#ffffff" : "#000000");
+      ctx.fillRect(x,y,pixelSize,pixelSize);
+      if(x == c.width-pixelSize){
+        x = 0;
+        y += pixelSize;
+      }
+      else{
+        x += pixelSize;
+      }
+    }
+  }
+
   </script>
 </body>
 
