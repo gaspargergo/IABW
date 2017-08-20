@@ -48,7 +48,7 @@
       transition: all 0.5s ease-in-out;
     }
 
-    #sizeMenu a{
+    #sizeMenu .plusminus{
       opacity: 0.05;
       transition: all 0.5s ease-in-out;
     }
@@ -76,6 +76,23 @@
       transform: rotate(-25deg);
     }
 
+    @-webkit-keyframes rotate {
+      from {
+        -webkit-transform: rotate(0deg);
+      }
+      to { 
+        -webkit-transform: rotate(360deg);
+      }
+    }
+
+    .spin
+    {
+        -webkit-animation-name:             rotate; 
+        -webkit-animation-duration:         0.5s; 
+        -webkit-animation-iteration-count:  infinite;
+        -webkit-animation-timing-function: linear;
+    }
+
   </style>
 </head>
 
@@ -86,9 +103,9 @@
   <div id="container"><canvas id="canvas" height="600px" width="600px"></canvas></div>
 
   <div id="sizeMenu">
-    <a onClick="changePixelSize('-')">-</a>
-    <span id="sizeNumber">100</span>
-    <a onClick="changePixelSize('+')">+</a>
+    <a onClick="changePixelSize('-')" class="plusminus">-</a>
+    <span id="sizeNumber"><a onClick="toggleSpin()">100</a></span>
+    <a onClick="changePixelSize('+')" class="plusminus">+</a>
   </div>
 </center>
 
@@ -108,7 +125,11 @@
   var sizes = [1,4,9,25,100,400,900,3600,10000,40000,90000,360000]; 
   var pixelArrayCounter = 4;
   var pixelSize = c.height/(Math.sqrt(sizes[pixelArrayCounter]));
-  var colors = ["#ffffff","#000000"]
+  var colors = ["#ffffff","#000000"];
+
+  var speeds = ["0.5","1","1.5","2","3","5","8","10","100"];
+  var speedCounter = 3;
+  var spinning = false;
 
   function colorPixels(){
     var x = 0;
@@ -129,15 +150,44 @@
     console.log("The number of different possibilities: " + Math.pow(2,sizes[pixelArrayCounter]));
   }
 
-  function changePixelSize(param){ //NOW WRITES THE NUMBER OF PIXELS INSTEAD OF THE SIZE
-    if(param == "+" && pixelArrayCounter != sizes.length-1){
+  function changePixelSize(param){ 
+    if(!spinning){
+      if(param == "+" && pixelArrayCounter != sizes.length-1){
       pixelArrayCounter += 1;
+      }
+      else if(param == "-" && pixelArrayCounter != 0){
+        pixelArrayCounter -= 1;
+      }
+      pixelSize = c.height/(Math.sqrt(sizes[pixelArrayCounter]));
+      document.getElementById("sizeNumber").innerHTML = "<a onClick='toggleSpin()'>" + sizes[pixelArrayCounter] + "</a>";
     }
-    else if(param == "-" && pixelArrayCounter != 0){
-      pixelArrayCounter -= 1;
+    else{
+      if(param == "+" && speedCounter != speeds.length-1){
+      speedCounter += 1;
+      }
+      else if(param == "-" && speedCounter != 0){
+        speedCounter -= 1;
+      }
+      c.style.animationDuration = 1/speeds[speedCounter] + "s";
+      document.getElementById("sizeNumber").innerHTML = "<a onClick='toggleSpin()'>" + speeds[speedCounter] + "/s</a>";
     }
-    pixelSize = c.height/(Math.sqrt(sizes[pixelArrayCounter]));
-    document.getElementById("sizeNumber").innerHTML = sizes[pixelArrayCounter];
+  }
+
+
+  function toggleSpin(){
+    if(!spinning){
+      c.className += "spin";
+      c.style.boxShadow ="none";
+      spinning = true;
+      document.getElementById("sizeNumber").innerHTML = "<a onClick='toggleSpin()'>" + speeds[speedCounter] + "/s</a>";
+    }
+    else{
+      c.classList.remove("spin");
+      c.style.boxShadow ="5px 5px 16px 0px rgba(171,171,171,0.82)";
+      spinning = false;
+      document.getElementById("sizeNumber").innerHTML = "<a onClick='toggleSpin()'>" + sizes[pixelArrayCounter] + "</a>";
+    }
+  
   }
   
   function draw(code){
